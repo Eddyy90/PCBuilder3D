@@ -1,0 +1,83 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+/* Container da tela dividida */
+.container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+/* Container para a cena 3D */
+.scene-container {
+    flex: 3; /* Ocupa 75% da tela */
+    background-color: #f9f9f9;
+    position: relative;
+}
+
+/* Canvas da cena 3D */
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Menu lateral */
+.menu-container {
+    flex: 1; /* Ocupa 25% da tela */
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Card de opções */
+.card {
+    background-color: #444;
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.card h3 {
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.card button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.card button:hover {
+    background-color: #0056b3;
+}
+
+.card-title {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+/* Estilo do título e subtítulo */
+.menu-container h2 {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+}
