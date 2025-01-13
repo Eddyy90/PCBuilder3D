@@ -1,70 +1,52 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from starlette.requests import Request
-from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
-from pydantic import BaseModel
-import os
+from sqlalchemy.orm import Session
+from db import crud, models, database_connection
+from db.schemas import PartCreate, Part
 
-# Criação do banco de dados (configuração diretamente aqui no api.py)
-DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://user:password@localhost:5432/dbname')
-
-# Criação da engine de conexão com o banco de dados
-engine = create_engine(DATABASE_URL)
-
-# Sessão local para as interações com o banco de dados
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Base para os modelos
-Base = declarative_base()
-
-# Criar as tabelas no banco de dados (se não existirem)
-Base.metadata.create_all(bind=engine)
-
-# Criando o modelo para a tabela 'parts'
-class PartInDB(Base):
-    __tablename__ = "parts"
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    model = Column(String)
-    description = Column(String)
-    category = Column(String)
-
-# Criando a instância da aplicação FastAPI
 app = FastAPI()
-
-# Montando o diretório estático
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-# Definir um modelo para a peça (Pydantic, usado para validar as requisições)
-class Part(BaseModel):
-    id: int
-    name: str
-    model: str
-    description: str
-    category: str
 
-# Função para obter a sessão do banco de dados
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-# Criando uma API para retornar as peças do banco de dados
 @app.get("/api/parts", response_model=list[Part])
-async def get_parts(db: Session = Depends(get_db)):
-    # Consulta todas as peças da tabela 'parts' no banco de dados
-    parts = db.query(PartInDB).all()
+async def get_parts(db: Session = Depends(database_connection.get_db)):
+    parts = crud.get_parts(db)
     return parts
 
-# Rota para servir o index.html
+
+@app.get("/api/parts/{part_id}", response_model=Part)
+async def get_part(part_id: int, db: Session = Depends(database_connection.get_db)):
+    db_part = crud.get_part_by_id(db, part_id)
+    if db_part is None:
+        raise HTTPException(status_code=404, detail="Peça não encontrada")
+    return db_part
+
+
+@app.post("/api/parts/create", response_model=Part)
+async def create_part(part: PartCreate, db: Session = Depends(database_connection.get_db)):
+    created_part = crud.create_part(db=db, part=part)
+    return created_part
+
+
+@app.put("/api/parts/update/{part_id}", response_model=Part)
+async def update_part(part_id: int, part: PartCreate, db: Session = Depends(database_connection.get_db)):
+    db_part = crud.update_part(db, part_id, part)
+    if db_part is None:
+        raise HTTPException(status_code=404, detail="Peça não encontrada")
+    return db_part
+
+
+@app.delete("/api/parts/delete/{part_id}", response_model=Part)
+async def delete_part(part_id: int, db: Session = Depends(database_connection.get_db)):
+    db_part = crud.delete_part(db, part_id)
+    if db_part is None:
+        raise HTTPException(status_code=404, detail="Peça não encontrada")
+    return db_part
+
+
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
