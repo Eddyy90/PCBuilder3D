@@ -5,7 +5,6 @@ from .schemas import PartCreate
 def create_part(db: Session, part: PartCreate):
     db_part = models.PartInDB(
         name=part.name,
-        model=part.model,
         description=part.description,
         category=part.category,
         model_url=part.model_url
@@ -25,7 +24,6 @@ def update_part(db: Session, part_id: int, part: PartCreate):
     db_part = db.query(models.PartInDB).filter(models.PartInDB.id == part_id).first()
     if db_part:
         db_part.name = part.name
-        db_part.model = part.model
         db_part.description = part.description
         db_part.category = part.category
         db_part.model_url = part.model_url

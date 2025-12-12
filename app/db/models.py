@@ -5,9 +5,7 @@ class PartInDB(Base):
     __tablename__ = "parts"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    model = Column(String)
-    description = Column(String)
-    category = Column(String)
-    model_url = Column(String)
-
+    name = Column(String, nullable=False)
+    description = Column(String, default="")
+    category = Column(String, nullable=False)
+    model_url = Column(String, nullable=False)  # caminho do arquivo 3D

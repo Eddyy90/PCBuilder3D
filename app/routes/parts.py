@@ -1,38 +1,12 @@
-from fastapi import FastAPI, Depends, HTTPException, Request, Form, UploadFile, File
-from fastapi.staticfiles import StaticFiles
+from fastapi import Depends, HTTPException, Request, Form, UploadFile, File
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-from db import crud, models, database_connection
-from db.database_connection import init_db
+from db import crud, database_connection
 from db.schemas import PartCreate, Part
 import os
-
-# Inicializa o banco de dados
-init_db()
-
-# Criação da aplicação com metadata do Swagger
-app = FastAPI(
-    title="Parts API",
-    description="API para gerenciamento de peças",
-    version="1.0.0",
-)
-
-# Arquivos estáticos e templates
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
-app.mount("/static", StaticFiles(directory="static"), name="static")
+from .api import app, templates, UPLOAD_DIR
 
 
-templates = Jinja2Templates(directory="templates")
-
-# Criar diretório para uploads se não existir
-UPLOAD_DIR = "uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-
-app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
-# ---------------------
-# Rotas da API
-# ---------------------
 
 # Criar nova peça com arquivo
 @app.post("/api/parts/", response_model=Part, tags=["Parts"])
