@@ -88,7 +88,7 @@ const loadPartsFromAPI = async () => {
 };
 
 const addPiece = (part) => {
-    const modelUrl = `static/models/${part.category.toLowerCase()}/${part.model}`;
+    const modelUrl = part.model_url;
     console.log(`Carregando modelo de ${part.name} a partir de ${modelUrl}`);
 
     loadGLBModel(modelUrl, new THREE.Vector3(0, 0, 0), (gltf) => {
