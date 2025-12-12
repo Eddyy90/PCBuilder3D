@@ -1,9 +1,11 @@
 fastapi==0.115.6
 uvicorn==0.34.0
 psycopg2-binary==2.9.10
-sqlalchemy
-asyncpg
-pydantic
+sqlalchemy==2.0.19
+asyncpg==0.27.0
+pydantic==2.7.1
 jinja2==3.1.2
-
-
+python-multipart==0.0.6
+aiofiles==23.1.0
+django-htmx==1.24.1
+alembic==1.16.5
